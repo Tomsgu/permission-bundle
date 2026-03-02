@@ -1,0 +1,61 @@
+{
+    "name": "tomsgu/permission-bundle",
+    "description": "Provides a simple layer to store permissions.",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "keywords": [
+        "permission",
+        "symfony",
+        "bundle",
+        "security",
+        "authorization"
+    ],
+    "homepage": "https://github.com/tomsgu/permission-bundle",
+    "support": {
+        "issues": "https://github.com/tomsgu/permission-bundle/issues",
+        "source": "https://github.com/tomsgu/permission-bundle"
+    },
+    "authors": [
+        {
+            "name": "Tomas Jakl",
+            "email": "tomasjakll@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.5",
+        "symfony/config": "^8.0",
+        "symfony/dependency-injection": "^8.0"
+    },
+    "require-dev": {
+        "doctrine/doctrine-bundle": "^3.0",
+        "doctrine/orm": "^3.6",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^13.0",
+        "symfony/cache": "^8.0",
+        "symfony/framework-bundle": "^8.0",
+        "symfony/yaml": "^8.0",
+        "symplify/easy-coding-standard": "^13.0"
+    },
+    "suggest": {
+        "symfony/security-bundle": "Required if you want to integrate with Symfony's security system"
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Tomsgu\\PermissionBundle\\": "src/"
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tomsgu\\PermissionBundle\\Tests\\": "tests/"
+        }
+    }
+}

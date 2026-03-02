@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Tomsgu\PermissionBundle\Manager\UserManager;
+
+return static function (ContainerConfigurator $container): void {
+    $services = $container->services();
+
+    $services->set('tomsgu_permission.manager.user', UserManager::class)
+        ->public();
+};
