@@ -1,10 +1,11 @@
-Tomsgu Permission Bundle
-========================
+[![Tests](https://github.com/Tomsgu/permission-bundle/actions/workflows/tests.yaml/badge.svg)](https://github.com/Tomsgu/permission-bundle/actions/workflows/tests.yaml)
+[![Static Analysis](https://github.com/Tomsgu/permission-bundle/actions/workflows/static-analysis.yaml/badge.svg)](https://github.com/Tomsgu/permission-bundle/actions/workflows/static-analysis.yaml)
+
+# Tomsgu Permission Bundle
 
 A Symfony bundle that provides a simple permission layer for access control. Use it when you need something more flexible than roles but less complex than ACL.
 
-Installation
-------------
+## Installation
 
 ```bash
 composer require tomsgu/permission-bundle
@@ -19,8 +20,7 @@ return [
 ];
 ```
 
-Configuration
--------------
+## Configuration
 
 ```yaml
 # config/packages/tomsgu_permission.yaml
@@ -87,8 +87,7 @@ class User implements UserPermissionInterface
 }
 ```
 
-Usage
------
+## Usage
 
 Inject `UserManagerInterface` to check permissions:
 
@@ -116,7 +115,6 @@ Load permissions defined in your configuration into the database:
 php bin/console tomsgu:permission:load
 ```
 
-License
--------
+## License
 
 MIT License. See [LICENSE](LICENSE) for details.
