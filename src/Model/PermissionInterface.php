@@ -11,4 +11,6 @@ interface PermissionInterface
     public function getName(): string;
 
     public function getDescription(): ?string;
+
+    public function setDescription(?string $description): void;
 }

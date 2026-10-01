@@ -36,10 +36,50 @@ class TomsguPermissionExtension extends Extension
             $this->loadBasicUserManager($container, $loader);
         }
 
-        // Set permissions array.
-        /** @var array<int, array{name: string, description: string}> $permissions */
+        /** @var array<string, array<string, mixed>> $permissions */
         $permissions = $config['permissions'];
-        $container->setParameter('tomsgu_permission.permissions', $permissions);
+        $container->setParameter('tomsgu_permission.permissions', $this->inDeclarationOrder($permissions, $configs));
+        $container->setParameter('tomsgu_permission.categories', is_array($config['categories']) ? $config['categories'] : []);
+        $container->setParameter('tomsgu_permission.levels', is_array($config['levels']) ? $config['levels'] : []);
+        $loader->load('catalogue.php');
+        if (!empty($config['database'])) {
+            $loader->load('synchronizer.php');
+            $loader->load('command.php');
+        }
+    }
+
+    /**
+     * Orders permissions by their last declaration, so a configuration that declares a permission
+     * again also decides where it is listed.
+     *
+     * @param array<string, array<string, mixed>> $permissions
+     * @param array<array-key, mixed> $configs
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function inDeclarationOrder(array $permissions, array $configs): array
+    {
+        $order = [];
+        foreach ($configs as $config) {
+            $declared = is_array($config) ? ($config['permissions'] ?? []) : [];
+            if (!is_array($declared)) {
+                continue;
+            }
+            foreach ($declared as $key => $permission) {
+                $name = is_array($permission) && is_string($permission['name'] ?? null) ? $permission['name'] : (string) $key;
+                unset($order[$name]);
+                $order[$name] = true;
+            }
+        }
+
+        $ordered = [];
+        foreach (array_keys($order) as $name) {
+            if (isset($permissions[$name])) {
+                $ordered[$name] = $permissions[$name];
+            }
+        }
+
+        return $ordered + $permissions;
     }
 
     private function loadBasicUserManager(ContainerBuilder $container, Loader\PhpFileLoader $loader): void
@@ -110,6 +150,5 @@ class TomsguPermissionExtension extends Extension
             'Tomsgu\PermissionBundle\Loader\PermissionLoaderInterface',
             new Alias('tomsgu_permission.loader.permission', false)
         );
-        $loader->load('command.php');
     }
 }

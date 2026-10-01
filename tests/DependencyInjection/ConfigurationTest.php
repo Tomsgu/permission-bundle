@@ -36,8 +36,8 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertCount(2, $config['permissions']);
-        $this->assertSame('ROLE_ADMIN', $config['permissions'][0]['name']);
-        $this->assertSame('Admin', $config['permissions'][0]['description']);
+        $this->assertSame('ROLE_ADMIN', $config['permissions']['ROLE_ADMIN']['name']);
+        $this->assertSame('Admin', $config['permissions']['ROLE_ADMIN']['description']);
     }
 
     public function testDatabaseConfig(): void

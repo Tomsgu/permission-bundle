@@ -107,13 +107,58 @@ class PostController
 }
 ```
 
-### Loading Permissions
+### Describing permissions
 
-Load permissions defined in your configuration into the database:
+```yaml
+tomsgu_permission:
+    categories:
+        content: Content
+        users:
+            label: Users
+            description: Accounts and what they may do
+    levels:
+        edit: Changes data
+        delete: Deletes data
+    permissions:
+        - { name: "POST_EDIT", label: "Edit posts", description: "Can change any post.", category: content, level: edit }
+        - { name: "POST_DELETE", label: "Delete posts", description: "Can delete any post.", category: content, level: delete }
+        - { name: "USER_BAN", label: "Ban users", description: "Can lock an account.", category: users }
+```
+
+Only `name` is required. `label`, `description`, `category` and `level` are for presenting permissions
+to people. A `level` says how much a permission lets someone do, so an application can mark the ones
+that change or delete data; it must be one of the keys declared under `levels`.
+
+Categories are listed in the order they are declared. Permissions are listed in the order they are
+declared, and a permission declared again under the same name overrides the earlier declaration and
+takes the later position. That lets an application give a label and a category to permissions that
+a library declares.
+
+### Showing permissions
+
+`Tomsgu\PermissionBundle\Catalogue\PermissionCatalogue` gives the declared categories and permissions
+in display order:
+
+```php
+foreach ($catalogue->categories() as $category) {
+    foreach ($catalogue->permissionsIn($category->key) as $permission) {
+        echo $permission->displayLabel(), ': ', $permission->description;
+    }
+}
+$catalogue->uncategorized();
+$catalogue->get('POST_EDIT');
+$catalogue->levelLabel('edit'); // "Changes data"
+```
+
+### Synchronizing the stored permissions
 
 ```bash
 php bin/console tomsgu:permission:load
 ```
+
+Creates the permissions that are missing and refreshes descriptions. Stored permissions that are no
+longer declared are listed, and deleted only with `--prune`. Deleting fails if rows in other tables
+still refer to the permission, so a join table to groups or users needs `ON DELETE CASCADE`.
 
 ## License
 

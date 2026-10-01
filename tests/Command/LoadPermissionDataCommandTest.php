@@ -7,30 +7,49 @@ namespace Tomsgu\PermissionBundle\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Tomsgu\PermissionBundle\Catalogue\PermissionCatalogue;
 use Tomsgu\PermissionBundle\Command\LoadPermissionDataCommand;
-use Tomsgu\PermissionBundle\Loader\PermissionLoaderInterface;
+use Tomsgu\PermissionBundle\Loader\PermissionSynchronizer;
+use Tomsgu\PermissionBundle\Tests\Loader\InMemoryPermissionManager;
 
 class LoadPermissionDataCommandTest extends TestCase
 {
-    public function testExecute(): void
+    public function testUndeclaredPermissionsAreReportedAndKept(): void
     {
-        $loader = $this->createMock(PermissionLoaderInterface::class);
-        $loader->expects($this->once())->method('loadPermissions');
-
-        $command = new LoadPermissionDataCommand($loader);
-        $tester = new CommandTester($command);
+        $manager = new InMemoryPermissionManager();
+        $manager->store('OBSOLETE', '');
+        $tester = new CommandTester($this->command($manager));
 
         $exitCode = $tester->execute([]);
 
         $this->assertSame(Command::SUCCESS, $exitCode);
-        $this->assertStringContainsString('Permissions were successfully loaded.', $tester->getDisplay());
+        $this->assertStringContainsString('Created (1): POST_EDIT', $tester->getDisplay());
+        $this->assertStringContainsString('No longer declared (1), run again with --prune to delete them: OBSOLETE', $tester->getDisplay());
+        $this->assertArrayHasKey('OBSOLETE', $manager->stored);
+    }
+
+    public function testPruneDeletesUndeclaredPermissions(): void
+    {
+        $manager = new InMemoryPermissionManager();
+        $manager->store('OBSOLETE', '');
+        $tester = new CommandTester($this->command($manager));
+
+        $tester->execute(['--prune' => true]);
+
+        $this->assertStringContainsString('Removed (1): OBSOLETE', $tester->getDisplay());
+        $this->assertArrayNotHasKey('OBSOLETE', $manager->stored);
     }
 
     public function testCommandName(): void
     {
-        $loader = $this->createStub(PermissionLoaderInterface::class);
-        $command = new LoadPermissionDataCommand($loader);
+        $this->assertSame('tomsgu:permission:load', $this->command(new InMemoryPermissionManager())->getName());
+    }
 
-        $this->assertSame('tomsgu:permission:load', $command->getName());
+    private function command(InMemoryPermissionManager $manager): LoadPermissionDataCommand
+    {
+        return new LoadPermissionDataCommand(new PermissionSynchronizer(
+            $manager,
+            new PermissionCatalogue([['name' => 'POST_EDIT', 'description' => 'Can edit posts.']])
+        ));
     }
 }

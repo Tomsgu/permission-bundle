@@ -21,4 +21,9 @@ abstract class Permission implements PermissionInterface
     {
         return $this->description;
     }
+
+    public function setDescription(?string $description): void
+    {
+        $this->description = $description;
+    }
 }

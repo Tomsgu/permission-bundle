@@ -8,11 +8,13 @@ use Tomsgu\PermissionBundle\Model\PermissionManagerInterface;
 
 /**
  * Load permissions to the database.
+ *
+ * @deprecated since 1.1, use PermissionSynchronizer, which also refreshes descriptions and can delete undeclared permissions.
  */
 class PermissionLoader implements PermissionLoaderInterface
 {
     /**
-     * @param array<string,array{name: string, description: string}> $permissions
+     * @param array<array-key, array{name: string, description: string}> $permissions
      */
     public function __construct(private PermissionManagerInterface $permissionManager, private array $permissions)
     {
